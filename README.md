@@ -13,3 +13,7 @@ A custom shell built with C. Some of the functions used to build its basic funct
 - getpid/getppid
 - isatty
 - getcwd
+
+## Contributors
+- Nkem Ike-Morris
+- Loïc Kami
