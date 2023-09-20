@@ -9,6 +9,7 @@ void trimLeft(char *str)
 {
 	int length = 0;
 	int start = 0;
+	int i;
 
 	if (str == NULL)
 		return;
@@ -25,7 +26,7 @@ void trimLeft(char *str)
 	/* If all leading characters are whitespace, str[start] will be '\0' */
 	if (start > 0)
 	{
-		int i = 0;
+		i = 0;
 
 		/* Shift the string left to remove leading whitespace */
 		while (str[start] != '\0')
