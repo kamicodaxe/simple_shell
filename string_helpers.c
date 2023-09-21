@@ -44,6 +44,7 @@ void trimLeft(char *str)
 {
 	int length = 0;
 	int start = 0;
+	int spaceFlag;
 	int i;
 
 	if (str == NULL)
@@ -62,12 +63,27 @@ void trimLeft(char *str)
 	if (start > 0)
 	{
 		i = 0;
+		spaceFlag = 0; /* Flag to keep track of single space */
 
 		/* Shift the string left to remove leading whitespace */
 		while (str[start] != '\0')
 		{
-			str[i] = str[start];
-			i++;
+			if (str[start] == ' ' || str[start] == '\t' || str[start] == '\n')
+			{
+				if (!spaceFlag)
+				{
+					str[i] = ' ';
+					i++;
+					spaceFlag = 1; /* Set flag to avoid multiple spaces */
+				}
+			}
+			else
+			{
+				str[i] = str[start];
+				i++;
+				spaceFlag = 0; /* Reset the space flag */
+			}
+
 			start++;
 		}
 
