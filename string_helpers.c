@@ -51,7 +51,6 @@ void trimLeft(char *str)
 		length++;
 
 	/* Find index of the first non-whitespace character */
-
 	while (start < length &&
 		   (str[start] == ' ' || str[start] == '\t' || str[start] == '\n'))
 		start++;
