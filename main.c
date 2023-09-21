@@ -147,7 +147,7 @@ int main(int argc, char **argv, char **env)
 
 	fileName = malloc(sizeof(*argv) + 1);
 	_strcpy(fileName, *argv);
-	while ((bytes_read = getline(&line, &len, stream)) != -1)
+	while ((bytes_read = _getline(&line, &len, stream)) != -1)
 	{
 		argv = lineparser(bytes_read, line, &argc);
 		if (argv == NULL)
