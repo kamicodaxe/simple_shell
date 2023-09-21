@@ -16,9 +16,6 @@ int argcc(size_t bytes_read, char *line)
 	char *line_copy;
 	int argc = 0;
 
-	/* Remove leading white spaces */
-	trimLeft(line);
-
 	if (line == NULL || *line == '\0' || *line == '\t')
 	{
 		return (-1);
@@ -62,7 +59,6 @@ char **lineparser(size_t bytes_read, char *line, int *argc)
 	char *token;
 	int i = 0;
 
-	trimLeft(line);
 	*argc = argcc(bytes_read, line);
 	if (*argc == -1)
 		return (NULL);
@@ -102,7 +98,7 @@ char **lineparser(size_t bytes_read, char *line, int *argc)
 void execmd(char **argv, char **env)
 {
 	char *path;
-	char error_msg[] = ": 1: not found\n";
+	char error_msg[] = ": not found\n";
 
 	if (_strcmp(*argv, "env") == 0)
 	{
@@ -113,10 +109,10 @@ void execmd(char **argv, char **env)
 	path = _strdup(find_path(argv[0]));
 	if (path == NULL)
 	{
-		write(STDOUT_FILENO, fileName, _strlen(fileName));
-		write(STDOUT_FILENO, ": ", 2);
-		write(STDOUT_FILENO, *argv, _strlen(*argv));
-		write(STDOUT_FILENO, error_msg, _strlen(error_msg));
+		write(STDERR_FILENO, fileName, _strlen(fileName));
+		write(STDERR_FILENO, ": 1: ", 5);
+		write(STDERR_FILENO, *argv, _strlen(*argv));
+		write(STDERR_FILENO, error_msg, _strlen(error_msg));
 		exit(127);
 	}
 
@@ -147,17 +143,14 @@ int main(int argc, char **argv, char **env)
 
 	fileName = malloc(sizeof(*argv) + 1);
 	_strcpy(fileName, *argv);
-	while ((bytes_read = _getline(&line, &len, stream)) != -1)
+	while ((bytes_read = getline(&line, &len, stream)) != -1)
 	{
 		argv = lineparser(bytes_read, line, &argc);
-		if (argv == NULL)
+		if (argv == NULL || argv[0] == NULL || *line == '\n')
 			continue;
 
-		if (argv[0] == NULL)
-			return (0);
-
 		if (_strcmp(*argv, "exit") == 0)
-			return (0);
+			_exit(argv[1] ? _atoi(argv[1]) : 0);
 
 		pid = fork();  /* Create the fork process*/
 		if (pid == -1) /* Check fork error*/
@@ -172,10 +165,13 @@ int main(int argc, char **argv, char **env)
 		if (pid > 0)
 		{
 			wait(&status); /* Wait for the child process to stop */
+			if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+			{
+				free(fileName);
+				exit(WEXITSTATUS(status));
+			}
 		}
 	}
-	free(line); /* Manually free pointer, line */
-	free(fileName);
 
 	return (0); /* Exit with NO_ERRORS! */
 }
