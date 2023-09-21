@@ -68,12 +68,9 @@ char **lineparser(size_t bytes_read, char *line, int *argc)
 	int i = 0;
 
 	trimLeft(line);
-
 	*argc = argcc(bytes_read, line);
 	if (*argc == -1)
-	{
 		return (NULL);
-	}
 
 	argv = malloc(sizeof(char *) * (*argc + 1));
 	if (argv == NULL)
@@ -84,10 +81,7 @@ char **lineparser(size_t bytes_read, char *line, int *argc)
 
 	token = _strtok(line, " ");
 	if (token == NULL)
-	{
-		perror("empty token");
-		return (NULL);
-	}
+		return (NULL); /* Empty token */
 
 	while (token != NULL)
 	{
@@ -102,7 +96,6 @@ char **lineparser(size_t bytes_read, char *line, int *argc)
 		token = _strtok(NULL, " ");
 	}
 	argv[i] = NULL;
-
 	return (argv);
 }
 
@@ -113,6 +106,13 @@ char **lineparser(size_t bytes_read, char *line, int *argc)
  */
 void execmd(char **argv, char **env)
 {
+
+	if (_strcmp(*argv, "env") == 0)
+	{
+		printenv(env);
+		return;
+	}
+
 	if ((execve(argv[0], argv, env)) == -1)
 	{
 		perror(fileName);
@@ -122,20 +122,21 @@ void execmd(char **argv, char **env)
 
 /**
  * main - Entry point of our simple shell
+ * @argc: Argument count
+ * @argv: Argument list
+ * @env: Environmental variables
  * Return: 0 if no error, -1 otherwise
  */
 int main(int argc, char **argv, char **env)
 {
 	char *line = NULL;
-	size_t len = 0;
+	size_t bytes_read, len = 0;
 	FILE *stream = stdin;
-	ssize_t bytes_read;
 	pid_t pid;
 	int status;
 
 	fileName = malloc(sizeof(*argv) + 1);
 	_strcpy(fileName, *argv);
-
 	while ((bytes_read = getline(&line, &len, stream)) != -1)
 	{
 		argv = lineparser(bytes_read, line, &argc);
@@ -149,8 +150,7 @@ int main(int argc, char **argv, char **env)
 		if (_strcmp(*argv, "exit") == 0)
 			return (0);
 
-		pid = fork(); /* Create the fork process*/
-
+		pid = fork();  /* Create the fork process*/
 		if (pid == -1) /* Check fork error*/
 		{
 			perror(fileName);
@@ -158,23 +158,14 @@ int main(int argc, char **argv, char **env)
 		}
 
 		if (pid == 0)
-		{
-			if (_strcmp(*argv, "env") == 0)
-			{
-				printenv(env);
-				return (0);
-			}
 			execmd(argv, env); /* Call execmd to execute line */
-		}
 
 		if (pid > 0)
 		{
 			wait(&status); /* Wait for the child process to stop */
 		}
 	}
-
-	/* Manually free pointer, line */
-	free(line);
+	free(line); /* Manually free pointer, line */
 	free(fileName);
 
 	return (0); /* Exit with NO_ERRORS! */

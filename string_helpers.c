@@ -9,6 +9,7 @@
 int _strlen(char *str)
 {
 	int i = 0;
+
 	while (str[i] != '\0')
 		i++;
 	return (i);
@@ -42,10 +43,7 @@ char *_strcpy(char *dest, char *src)
  */
 void trimLeft(char *str)
 {
-	int length = 0;
-	int start = 0;
-	int spaceFlag;
-	int i;
+	int i, spaceFlag, length = 0, start = 0;
 
 	if (str == NULL)
 		return;
@@ -54,9 +52,8 @@ void trimLeft(char *str)
 		length++;
 
 	/* Find index of the first non-whitespace character */
-	while (
-		start < length &&
-		(str[start] == ' ' || str[start] == '\t' || str[start] == '\n'))
+	while (start < length &&
+		   (str[start] == ' ' || str[start] == '\t' || str[start] == '\n'))
 		start++;
 
 	/* If all leading characters are whitespace, str[start] will be '\0' */
@@ -64,7 +61,6 @@ void trimLeft(char *str)
 	{
 		i = 0;
 		spaceFlag = 0; /* Flag to keep track of single space */
-
 		/* Shift the string left to remove leading whitespace */
 		while (str[start] != '\0')
 		{
@@ -83,10 +79,8 @@ void trimLeft(char *str)
 				i++;
 				spaceFlag = 0; /* Reset the space flag */
 			}
-
 			start++;
 		}
-
 		str[i] = '\0'; /* Null-terminate the new string */
 	}
 }
