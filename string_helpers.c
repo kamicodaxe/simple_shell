@@ -1,8 +1,47 @@
 #include "shell.h"
 <<<<<<< HEAD
+<<<<<<< HEAD
 #include <stdio.h>
 =======
 >>>>>>> 2bdb86662b19e47341da4dd7117e3fa91e2b4c0e
+=======
+
+/**
+ * _strlen - Returns the length of string
+ * @str: string input pointer
+ * Return: Length of string
+ */
+int _strlen(char *str)
+{
+	int i = 0;
+
+	while (str[i] != '\0')
+		i++;
+	return (i);
+}
+
+/**
+ * _strcpy - A function that copies the string pointed
+ * to by src,including the terminating null byte \0
+ * to the buffer pointed to by dest.
+ * @dest: Pointer char, destination of copy
+ * @src: Pointer char, source of copy
+ *
+ * Return: The pointer to dest.
+ */
+char *_strcpy(char *dest, char *src)
+{
+	int i = 0;
+
+	for (; src[i]; i++)
+	{
+		dest[i] = src[i];
+	}
+
+	dest[i] = '\0';
+	return (dest);
+}
+>>>>>>> 7cab1ee536b2a3c7e6a9b3df18d3359be661138f
 
 /**
  * trimLeft - Removes leading white spaces
@@ -10,8 +49,7 @@
  */
 void trimLeft(char *str)
 {
-	int length = 0;
-	int start = 0;
+	int i, spaceFlag, length = 0, start = 0;
 
 	if (str == NULL)
 		return;
@@ -20,24 +58,36 @@ void trimLeft(char *str)
 		length++;
 
 	/* Find index of the first non-whitespace character */
-	while (
-		start < length &&
-		(str[start] == ' ' || str[start] == '\t' || str[start] == '\n'))
+
+	while (start < length &&
+		   (str[start] == ' ' || str[start] == '\t' || str[start] == '\n'))
 		start++;
 
 	/* If all leading characters are whitespace, str[start] will be '\0' */
 	if (start > 0)
 	{
-		int i = 0;
-
+		i = 0;
+		spaceFlag = 0; /* Flag to keep track of single space */
 		/* Shift the string left to remove leading whitespace */
 		while (str[start] != '\0')
 		{
-			str[i] = str[start];
-			i++;
+			if (str[start] == ' ' || str[start] == '\t' || str[start] == '\n')
+			{
+				if (!spaceFlag)
+				{
+					str[i] = ' ';
+					i++;
+					spaceFlag = 1; /* Set flag to avoid multiple spaces */
+				}
+			}
+			else
+			{
+				str[i] = str[start];
+				i++;
+				spaceFlag = 0; /* Reset the space flag */
+			}
 			start++;
 		}
-
 		str[i] = '\0'; /* Null-terminate the new string */
 	}
 }
