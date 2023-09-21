@@ -1,3 +1,7 @@
-TEST_SUITES
+TEST_SUITE/**
 allowed_functions
 runchecker.bash
+
+hsh
+a.out
+

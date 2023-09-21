@@ -17,8 +17,13 @@ char *_strchr(const char *str, int character);
 int _strlen(char *str);
 char *_strdup(char *s);
 char *_strcpy(char *dest, char *src);
-void trimLeft(char *str);
 char *_getenv(char *envname);
 char *find_path(char *cmd);
+void trimLeft(char *str);
+void free2D(char **grid, int rows);
+int _strcmp(char *s1, char *s2);
+void printenv(char **env);
+char *_getenv(const char *envname);
+
 
 #endif
