@@ -150,7 +150,7 @@ int main(int argc, char **argv, char **env)
 			continue;
 
 		if (_strcmp(*argv, "exit") == 0)
-			return (0);
+			_exit(argv[1] ? _atoi(argv[1]) : 0);
 
 		pid = fork();  /* Create the fork process*/
 		if (pid == -1) /* Check fork error*/
