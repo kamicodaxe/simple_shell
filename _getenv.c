@@ -23,6 +23,13 @@ char *_getenv(char *envname)
 	{
 		if (_strncmp(*env, envname, len) == 0 && (*env)[len] == '=')
 			return (&(*env)[len + 1]); /* Return the value part */
+
+		while (**env)
+		{
+			(*env)++;
+			if (**env == '=')
+				break;
+		}
 	}
 	return (NULL);
 }

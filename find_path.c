@@ -1,55 +1,55 @@
 #include "shell.h"
+#include <stdlib.h>
 
 /**
- * find_path - A function that handles PATH
- * @cmd: path to execute command
+ * find_path - A function that finds the full path of an executable
+ * @cmd: The name of the executable file
  *
- * Return: Pointer to the file path, NULL if not found
+ * Return: Pointer to the full path, NULL if not found
  */
 
 char *find_path(char *cmd)
 {
 	char *p;
-	char *cpp;
-	char *pdir;
 	char f_path[MAX_BUF_SIZE];
-	int i, j;
+
+	if (cmd == NULL)
+		return (NULL); /* Invalid cmd parameter */
+
+	if (*cmd == '/' || *cmd == '.')
+		return (cmd);
 
 	p = _getenv("PATH");
+
 	if (p == NULL)
 	{
-		perror("_getenv");
-		exit(EXIT_FAILURE);
+		return (NULL);
 	}
 
-	cpp = _strdup(p); /* copy so original path is not modified */
-	if (cpp == NULL)
+	while (*p)
 	{
-		perror("_strdup");
-		exit(EXIT_FAILURE);
-	}
+		int i = 0;
 
-	pdir = _strtok(cpp, ":");
-
-	while (pdir != NULL)
-	{
-		i = 0;
-		while (*pdir != '\0')
+		/* Copy characters from PATH to f_path until a ':' or '\0' is encountered */
+		while (*p && *p != ':')
 		{
-			f_path[i++] = *pdir++;
+			f_path[i++] = *p++;
 		}
-		f_path[i++] = '/';
-		j = 0;
-		while (cmd[j] != '\0')
-		{
-			f_path[i++] = cmd[j++];
-		}
-		f_path[0] = '\0';
 
+		/* Null-terminate the path */
+		f_path[i] = '\0';
+
+		/* Append the command name to the path */
+		_strcat(f_path, "/");
+		_strcat(f_path, cmd);
+
+		/* Check if the path/filename is executable */
 		if (access(f_path, X_OK) == 0)
-			return (_strdup(f_path));
+			return _strdup(f_path); /* Found the executable */
 
-		pdir = _strtok(NULL, ":");
+		if (*p)
+			p++; /* Skip the ':' if not at the end of PATH */
 	}
-	return (NULL);
+
+	return (NULL); /* Executable not found in any directory */
 }
