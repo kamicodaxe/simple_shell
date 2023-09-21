@@ -15,5 +15,8 @@ char *_strchr(const char *str, int character);
 void trimLeft(char *str);
 char *_strcpy(char *dest, char *src);
 int _strlen(char *str);
+void free2D(char **grid, int rows);
+int _strcmp(char *s1, char *s2);
+void printenv(char **env);
 
 #endif
