@@ -1,5 +1,8 @@
 #include "shell.h"
+<<<<<<< HEAD
 #include <stdio.h>
+=======
+>>>>>>> 2bdb86662b19e47341da4dd7117e3fa91e2b4c0e
 
 /**
  * trimLeft - Removes leading white spaces

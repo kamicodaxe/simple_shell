@@ -1,10 +1,10 @@
 #ifndef SHELL_H
 #define SHELL_H
+#define MAX_BUF_SIZE 1024
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <stdbool.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -14,7 +14,16 @@ ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
 int _strncmp(char *s1, char *s2, size_t n);
 char *_strtok(char *str, const char *delim);
 char *_strchr(const char *str, int character);
+<<<<<<< HEAD
 void trimLeft(char *str);
 char *_getenv(const char *envname);
+=======
+int _strlen(char *str);
+char *_strdup(char *s);
+char *_strcpy(char *dest, char *src);
+void trimLeft(char *str);
+char *_getenv(char *envname);
+char *find_path(char *cmd);
+>>>>>>> 2bdb86662b19e47341da4dd7117e3fa91e2b4c0e
 
 #endif
