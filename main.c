@@ -5,6 +5,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+static char *fileName;
+
 /**
  * argcc - argc compute
  * @bytes_read: number of bytes read by getline
@@ -24,7 +26,6 @@ int argcc(size_t bytes_read, char *line)
 
 	if (line == NULL || *line == '\0' || *line == '\t')
 	{
-		perror("empty line");
 		return (-1);
 	}
 
@@ -66,10 +67,11 @@ char **lineparser(size_t bytes_read, char *line, int *argc)
 	char *token;
 	int i = 0;
 
+	trimLeft(line);
+
 	*argc = argcc(bytes_read, line);
 	if (*argc == -1)
 	{
-		perror("argc error");
 		return (NULL);
 	}
 
@@ -107,13 +109,13 @@ char **lineparser(size_t bytes_read, char *line, int *argc)
 /**
  * execmd - Executes argv array in execve
  * @argv: double pointer to the arguments for execve
+ * @env: Environmental variables
  */
-void execmd(char **argv)
+void execmd(char **argv, char **env)
 {
-
-	if ((execve(argv[0], argv, environ)) == -1)
+	if ((execve(argv[0], argv, env)) == -1)
 	{
-		perror("./shell2");
+		perror(fileName);
 		exit(EXIT_FAILURE); /* Exit due to execve error */
 	}
 }
@@ -122,7 +124,7 @@ void execmd(char **argv)
  * main - Entry point of our simple shell
  * Return: 0 if no error, -1 otherwise
  */
-int main(void)
+int main(int argc, char **argv, char **env)
 {
 	char *line = NULL;
 	size_t len = 0;
@@ -130,28 +132,39 @@ int main(void)
 	ssize_t bytes_read;
 	pid_t pid;
 	int status;
-	char **argv;
-	int argc = 0;
+
+	fileName = malloc(sizeof(*argv) + 1);
+	_strcpy(fileName, *argv);
 
 	while ((bytes_read = getline(&line, &len, stream)) != -1)
 	{
+		argv = lineparser(bytes_read, line, &argc);
+		if (argv == NULL)
+			continue;
+
+		/* TODO: getPath */
+		if (argv[0] == NULL)
+			return (0);
+
+		if (_strcmp(*argv, "exit") == 0)
+			return (0);
+
 		pid = fork(); /* Create the fork process*/
 
 		if (pid == -1) /* Check fork error*/
 		{
-			perror("./shell0");
+			perror(fileName);
 			exit(EXIT_FAILURE); /* Exit due to fork error */
 		}
 
 		if (pid == 0)
 		{
-			argv = lineparser(bytes_read, line, &argc);
-			if (argv == NULL)
+			if (_strcmp(*argv, "env") == 0)
 			{
-				perror("argv");
-				exit(EXIT_FAILURE);
+				printenv(env);
+				return (0);
 			}
-			execmd(argv); /* Call execmd to execute line */
+			execmd(argv, env); /* Call execmd to execute line */
 		}
 
 		if (pid > 0)
@@ -162,6 +175,7 @@ int main(void)
 
 	/* Manually free pointer, line */
 	free(line);
+	free(fileName);
 
 	return (0); /* Exit with NO_ERRORS! */
 }
