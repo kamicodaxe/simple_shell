@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 extern char **environ;
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
