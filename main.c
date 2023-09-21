@@ -98,7 +98,7 @@ char **lineparser(size_t bytes_read, char *line, int *argc)
 void execmd(char **argv, char **env)
 {
 	char *path;
-	char error_msg[] = ": 1: not found\n";
+	char error_msg[] = ": not found\n";
 
 	if (_strcmp(*argv, "env") == 0)
 	{
@@ -109,10 +109,10 @@ void execmd(char **argv, char **env)
 	path = _strdup(find_path(argv[0]));
 	if (path == NULL)
 	{
-		write(STDOUT_FILENO, fileName, _strlen(fileName));
-		write(STDOUT_FILENO, ": ", 2);
-		write(STDOUT_FILENO, *argv, _strlen(*argv));
-		write(STDOUT_FILENO, error_msg, _strlen(error_msg));
+		write(STDERR_FILENO, fileName, _strlen(fileName));
+		write(STDERR_FILENO, ": 1: ", 5);
+		write(STDERR_FILENO, *argv, _strlen(*argv));
+		write(STDERR_FILENO, error_msg, _strlen(error_msg));
 		exit(127);
 	}
 
@@ -165,10 +165,13 @@ int main(int argc, char **argv, char **env)
 		if (pid > 0)
 		{
 			wait(&status); /* Wait for the child process to stop */
+			if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+			{
+				free(fileName);
+				exit(WEXITSTATUS(status));
+			}
 		}
 	}
-
-	free(fileName);
 
 	return (0); /* Exit with NO_ERRORS! */
 }
