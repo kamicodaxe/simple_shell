@@ -1,19 +1,6 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 7cab1ee536b2a3c7e6a9b3df18d3359be661138f
 TEST_SUITE/**
 allowed_functions
 runchecker.bash
 
 hsh
 a.out
-<<<<<<< HEAD
-=======
-TEST_SUITES
-allowed_functions
-runchecker.bash
->>>>>>> 2bdb86662b19e47341da4dd7117e3fa91e2b4c0e
-=======
-
->>>>>>> 7cab1ee536b2a3c7e6a9b3df18d3359be661138f

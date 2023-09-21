@@ -1,10 +1,4 @@
 #include "shell.h"
-<<<<<<< HEAD
-<<<<<<< HEAD
-#include <stdio.h>
-=======
->>>>>>> 2bdb86662b19e47341da4dd7117e3fa91e2b4c0e
-=======
 
 /**
  * _strlen - Returns the length of string
@@ -41,7 +35,6 @@ char *_strcpy(char *dest, char *src)
 	dest[i] = '\0';
 	return (dest);
 }
->>>>>>> 7cab1ee536b2a3c7e6a9b3df18d3359be661138f
 
 /**
  * trimLeft - Removes leading white spaces
