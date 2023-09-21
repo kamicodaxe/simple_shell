@@ -23,5 +23,6 @@ void trimLeft(char *str);
 void free2D(char **grid, int rows);
 int _strcmp(char *s1, char *s2);
 void printenv(char **env);
+char *_strcat(char *dest, char *src);
 
 #endif

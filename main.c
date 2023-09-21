@@ -101,6 +101,8 @@ char **lineparser(size_t bytes_read, char *line, int *argc)
  */
 void execmd(char **argv, char **env)
 {
+	char *path;
+	char error_msg[] = ": 1: not found\n";
 
 	if (_strcmp(*argv, "env") == 0)
 	{
@@ -108,10 +110,22 @@ void execmd(char **argv, char **env)
 		return;
 	}
 
+	path = _strdup(find_path(argv[0]));
+	if (path == NULL)
+	{
+		write(STDOUT_FILENO, fileName, _strlen(fileName));
+		write(STDOUT_FILENO, ": ", 2);
+		write(STDOUT_FILENO, *argv, _strlen(*argv));
+		write(STDOUT_FILENO, error_msg, _strlen(error_msg));
+		exit(127);
+	}
+
+	_strcpy(argv[0], path);
+
 	if ((execve(argv[0], argv, env)) == -1)
 	{
 		perror(fileName);
-		exit(EXIT_FAILURE); /* Exit due to execve error */
+		exit(127); /* Exit cmd not found */
 	}
 }
 
@@ -139,9 +153,9 @@ int main(int argc, char **argv, char **env)
 		if (argv == NULL)
 			continue;
 
-		/* TODO: getPath */
 		if (argv[0] == NULL)
 			return (0);
+
 		if (_strcmp(*argv, "exit") == 0)
 			return (0);
 
