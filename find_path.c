@@ -32,9 +32,7 @@ char *find_path(char *cmd)
 
 		/* Copy characters from PATH to f_path until a ':' or '\0' is encountered */
 		while (*p && *p != ':')
-		{
 			f_path[i++] = *p++;
-		}
 
 		/* Null-terminate the path */
 		f_path[i] = '\0';
@@ -45,7 +43,7 @@ char *find_path(char *cmd)
 
 		/* Check if the path/filename is executable */
 		if (access(f_path, X_OK) == 0)
-			return _strdup(f_path); /* Found the executable */
+			return (_strdup(f_path)); /* Found the executable */
 
 		if (*p)
 			p++; /* Skip the ':' if not at the end of PATH */
