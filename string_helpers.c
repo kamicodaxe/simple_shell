@@ -1,5 +1,4 @@
 #include "shell.h"
-#include <stdio.h>
 
 /**
  * _strlen - Returns the length of string
@@ -52,6 +51,7 @@ void trimLeft(char *str)
 		length++;
 
 	/* Find index of the first non-whitespace character */
+
 	while (start < length &&
 		   (str[start] == ' ' || str[start] == '\t' || str[start] == '\n'))
 		start++;
