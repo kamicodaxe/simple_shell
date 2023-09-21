@@ -13,5 +13,7 @@ ssize_t _prompt(void);
 char *_strtok(char *str, const char *delim);
 char *_strchr(const char *str, int character);
 void trimLeft(char *str);
+char *_strcpy(char *dest, char *src);
+int _strlen(char *str);
 
 #endif
