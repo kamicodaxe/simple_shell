@@ -125,7 +125,8 @@ void execmd(char **argv, char **env)
 int main(int argc, char **argv, char **env)
 {
 	char *line = NULL;
-	size_t bytes_read, len = 0;
+	size_t len = 0;
+	ssize_t bytes_read;
 	FILE *stream = stdin;
 	pid_t pid;
 	int status;
@@ -141,7 +142,6 @@ int main(int argc, char **argv, char **env)
 		/* TODO: getPath */
 		if (argv[0] == NULL)
 			return (0);
-
 		if (_strcmp(*argv, "exit") == 0)
 			return (0);
 
