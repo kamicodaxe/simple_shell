@@ -16,9 +16,6 @@ int argcc(size_t bytes_read, char *line)
 	char *line_copy;
 	int argc = 0;
 
-	/* Remove leading white spaces */
-	trimLeft(line);
-
 	if (line == NULL || *line == '\0' || *line == '\t')
 	{
 		return (-1);
@@ -62,7 +59,6 @@ char **lineparser(size_t bytes_read, char *line, int *argc)
 	char *token;
 	int i = 0;
 
-	trimLeft(line);
 	*argc = argcc(bytes_read, line);
 	if (*argc == -1)
 		return (NULL);
@@ -147,14 +143,11 @@ int main(int argc, char **argv, char **env)
 
 	fileName = malloc(sizeof(*argv) + 1);
 	_strcpy(fileName, *argv);
-	while ((bytes_read = _getline(&line, &len, stream)) != -1)
+	while ((bytes_read = getline(&line, &len, stream)) != -1)
 	{
 		argv = lineparser(bytes_read, line, &argc);
-		if (argv == NULL)
+		if (argv == NULL || argv[0] == NULL || *line == '\n')
 			continue;
-
-		if (argv[0] == NULL)
-			return (0);
 
 		if (_strcmp(*argv, "exit") == 0)
 			return (0);
@@ -174,7 +167,7 @@ int main(int argc, char **argv, char **env)
 			wait(&status); /* Wait for the child process to stop */
 		}
 	}
-	free(line); /* Manually free pointer, line */
+
 	free(fileName);
 
 	return (0); /* Exit with NO_ERRORS! */
