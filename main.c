@@ -40,7 +40,6 @@ int argcc(size_t bytes_read, char *line)
 	}
 
 	free(line_copy);
-
 	return (argc);
 }
 
@@ -115,10 +114,10 @@ void execmd(char **argv, char **env)
 	}
 
 	argv[0] = path;
-
 	if ((execve(argv[0], argv, env)) == -1)
 	{
 		perror(fileName);
+		free(path);
 		exit(2);
 	}
 }
@@ -127,37 +126,30 @@ void execmd(char **argv, char **env)
  * processCommand - Process and execute a parsed command.
  * @parsedLine: The parsed command to process and execute.
  * @env: Environmental variables.
- *
+ * Return: status
  */
-void processCommand(char **parsedLine, char **env)
+int processCommand(char **parsedLine, char **env)
 {
 	pid_t pid;
 	int status;
-	int exit_status;
 
 	pid = fork();
 	if (pid == -1)
 	{
 		perror(fileName);
-		exit(EXIT_FAILURE);
+		return (-1);
 	}
 
 	if (pid == 0)
-	{
 		execmd(parsedLine, env);
-	}
 
 	if (pid > 0)
 	{
 		wait(&status);
-		exit_status = WEXITSTATUS(status);
-		if (WIFEXITED(status) && (exit_status == 127 || exit_status == 2))
-		{
-			free2D(parsedLine);
-			free(fileName);
-			exit(exit_status);
-		}
+		if (WIFEXITED(status))
+			return (WEXITSTATUS(status));
 	}
+	return (0);
 }
 
 /**
@@ -174,6 +166,7 @@ int main(int argc, char **argv, char **env)
 	ssize_t bytes_read;
 	FILE *stream = stdin;
 	char **parsedLine;
+	int exit_status;
 
 	fileName = _strdup(*argv);
 	while ((bytes_read = getline(&line, &len, stream)) != -1)
@@ -184,16 +177,17 @@ int main(int argc, char **argv, char **env)
 
 		if (_strcmp(*parsedLine, "exit") == 0)
 		{
+			free(fileName);
 			free(line);
 			_exit(parsedLine[1] ? _atoi(parsedLine[1]) : 0);
 		}
 
-		processCommand(parsedLine, env);
-
-		free2D(parsedLine);
+		exit_status = processCommand(parsedLine, env);
 	}
+
 	free(fileName);
 	free(line);
+	free2D(parsedLine);
 
-	return (0); /* Exit with NO_ERRORS! */
+	return (exit_status); /* Exit returning exit_status */
 }
