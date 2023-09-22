@@ -56,20 +56,20 @@ int _strncmp(char *s1, char *s2, size_t n)
  */
 char *_strdup(char *s)
 {
+	size_t len;
 	char *d;
-	int len;
 
 	if (s == NULL)
 		return (NULL);
-	len = _strlen(s);
-	d = (char *)malloc(len + 1); /* allocate memory */
 
+	len = _strlen(s);
+
+	d = (char *)malloc(len + 1);
 	if (d == NULL)
-	{
-		perror("_strdup malloc:");
-		exit(EXIT_FAILURE);
-	}
+		return (NULL);
+
 	_strcpy(d, s);
+
 	return (d);
 }
 
