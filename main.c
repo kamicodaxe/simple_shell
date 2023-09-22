@@ -119,7 +119,7 @@ void execmd(char **argv, char **env)
 	if ((execve(argv[0], argv, env)) == -1)
 	{
 		perror(fileName);
-		exit(127); /* Exit cmd not found */
+		exit(2);
 	}
 }
 
@@ -133,6 +133,7 @@ void processCommand(char **parsedLine, char **env)
 {
 	pid_t pid;
 	int status;
+	int exit_status;
 
 	pid = fork();
 	if (pid == -1)
@@ -149,11 +150,12 @@ void processCommand(char **parsedLine, char **env)
 	if (pid > 0)
 	{
 		wait(&status);
-		if (WIFEXITED(status) && WEXITSTATUS(status) == 127)
+		exit_status = WEXITSTATUS(status);
+		if (WIFEXITED(status) && (exit_status == 127 || exit_status == 2))
 		{
 			free2D(parsedLine);
 			free(fileName);
-			exit(WEXITSTATUS(status));
+			exit(exit_status);
 		}
 	}
 }
@@ -182,9 +184,7 @@ int main(int argc, char **argv, char **env)
 
 		if (_strcmp(*parsedLine, "exit") == 0)
 		{
-			free2D(parsedLine);
 			free(line);
-			free(fileName);
 			_exit(parsedLine[1] ? _atoi(parsedLine[1]) : 0);
 		}
 
