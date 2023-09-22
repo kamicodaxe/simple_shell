@@ -1,8 +1,8 @@
-#include <sys/types.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <errno.h>
+#include <sys/types.h>
 
 #define READ_SIZE 1024
 
@@ -30,29 +30,6 @@ int _getc(int fd)
 }
 
 /**
- * _skip_whitespace - Skip whitespace characters in the input stream
- * @stream: The input stream
- *
- * Return: 0 if successful, -1 on error or end of file
- */
-int _skip_whitespace(FILE *stream)
-{
-	int ch;
-
-	do {
-		ch = _getc(stream->_fileno);
-
-		if (ch == EOF)
-		{
-			return (-1); /* Error or end of file */
-		}
-	} while (ch == ' ' || (ch >= '\t' && ch <= '\r') || ch == '\v' || ch == '\f');
-	/* Check if whitespace*/
-
-	return (0);
-}
-
-/**
  * _realloc_line - Reallocates memory for the line buffer when needed
  * @lineptr: Pointer to the line buffer
  * @n: Pointer to the line buffer size
@@ -62,22 +39,26 @@ int _skip_whitespace(FILE *stream)
  */
 int _realloc_line(char **lineptr, size_t *n, size_t line_len)
 {
-	char *line = *lineptr;
-	size_t line_size = *n;
+	size_t new_size, i;
 	char *new_line;
 
-	if (line_len >= line_size - 1)
+	if (line_len >= *n - 1)
 	{
-		line_size *= 2;
-		new_line = malloc(line_size);
+		new_size = *n * 2;
+		new_line = (char *)malloc(new_size);
 		if (new_line == NULL)
 		{
-			free(line);
 			return (-1); /* Memory reallocation failed */
 		}
-		line = new_line;
-		*lineptr = line;
-		*n = line_size;
+		/* Copy the existing data to the new buffer */
+		for (i = 0; i < line_len; i++)
+		{
+			new_line[i] = (*lineptr)[i];
+		}
+
+		free(*lineptr);
+		*lineptr = new_line;
+		*n = new_size;
 	}
 
 	return (0);
@@ -93,37 +74,43 @@ int _realloc_line(char **lineptr, size_t *n, size_t line_len)
  */
 ssize_t _readline(char **lineptr, size_t *n, FILE *stream)
 {
-	char *line;
+	char *line = *lineptr;
 	size_t line_len = 0;
-	int current_char;
-
-	line = *lineptr;
-	if (_skip_whitespace(stream) == -1)
-		return (-1);
+	int current_char = 0;
 
 	while (1)
 	{
+		current_char = _getc(stream->_fileno);
 		if (current_char == EOF)
 		{
 			if (line_len == 0)
-			{
-				free(line);
 				return (-1); /* EOF and no data read */
-			}
-			break; /* EOF or EOL */
+			break;			 /* EOF or EOL */
 		}
 
 		if (current_char == '\n')
 			break; /* End of line */
 
-		if (_realloc_line(lineptr, n, line_len) == -1)
-			return (-1);
+		if (line_len >= *n - 1)
+		{
+			if (_realloc_line(&line, n, line_len) == -1)
+				return (-1);
+		}
 
 		line[line_len++] = (char)current_char;
-		current_char = _getc(stream->_fileno);
+
+		/* Remove white spaces */
+		if (line_len == 1 &&
+			(current_char == ' ' ||
+			 (current_char >= '\t' && current_char <= '\r') ||
+			 current_char == '\v' || current_char == '\f'))
+		{
+			line_len--;
+		}
 	}
 
 	line[line_len] = '\0';
+	*lineptr = line;
 	return ((ssize_t)line_len);
 }
 
@@ -137,7 +124,6 @@ ssize_t _readline(char **lineptr, size_t *n, FILE *stream)
  */
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
 {
-
 	if (lineptr == NULL || n == NULL)
 	{
 		errno = EINVAL;
