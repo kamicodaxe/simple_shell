@@ -4,17 +4,18 @@
 /**
  * free2D - Frees a 2-dimensional array.
  * @grid: Pointer to the 2D array to be freed.
- * @rows: Number of rows.
  */
-void free2D(char **grid, int rows)
+void free2D(char **grid)
 {
 	int row;
 
 	if (grid == NULL)
 		return;
 
-	for (row = 0; row < rows; row++)
+	for (row = 0; grid[row] != NULL; row++)
+	{
 		free(grid[row]);
+	}
 
 	free(grid);
 }
