@@ -74,13 +74,13 @@ char **lineparser(size_t bytes_read, char *line, int *argc)
 
 	while (token != NULL)
 	{
-		argv[i] = malloc(_strlen(token) + 1);
+		argv[i] = _strdup(token);
 		if (argv[i] == NULL)
 		{
 			perror("argv malloc");
+			free2D(argv);
 			return (NULL);
 		}
-		argv[i] = _strdup(token);
 		i++;
 		token = _strtok(NULL, " ");
 	}
@@ -101,7 +101,7 @@ void execmd(char **argv, char **env)
 	if (_strcmp(*argv, "env") == 0)
 	{
 		printenv(env);
-		return;
+		_exit(0);
 	}
 
 	path = _strdup(find_path(argv[0]));
@@ -119,7 +119,6 @@ void execmd(char **argv, char **env)
 	if ((execve(argv[0], argv, env)) == -1)
 	{
 		perror(fileName);
-		free(path);
 		exit(2);
 	}
 }
@@ -152,7 +151,7 @@ int processCommand(char **parsedLine, char **env)
 		else
 		{
 			perror(fileName);
-			_exit(1);
+			_exit(errno);
 		}
 	}
 
