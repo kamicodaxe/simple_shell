@@ -25,14 +25,12 @@ int argcc(size_t bytes_read, char *line)
 	if (bytes_read > 0 && line[bytes_read - 1] == '\n')
 		line[bytes_read - 1] = '\0'; /* line should be null terminated */
 
-	line_copy = malloc(_strlen(line) + 1);
+	line_copy = _strdup(line);
 	if (line_copy == NULL)
 	{
-		perror("line_copy malloc error");
+		perror("line_copy _strdup error");
 		return (-1);
 	}
-
-	_strcpy(line_copy, line);
 
 	token = _strtok(line_copy, " ");
 	if (token != NULL)
@@ -82,7 +80,7 @@ char **lineparser(size_t bytes_read, char *line, int *argc)
 			perror("argv malloc");
 			return (NULL);
 		}
-		_strcpy(argv[i], token);
+		argv[i] = _strdup(token);
 		i++;
 		token = _strtok(NULL, " ");
 	}
@@ -116,12 +114,47 @@ void execmd(char **argv, char **env)
 		exit(127);
 	}
 
-	_strcpy(argv[0], path);
+	argv[0] = path;
 
 	if ((execve(argv[0], argv, env)) == -1)
 	{
 		perror(fileName);
 		exit(127); /* Exit cmd not found */
+	}
+}
+
+/**
+ * processCommand - Process and execute a parsed command.
+ * @parsedLine: The parsed command to process and execute.
+ * @env: Environmental variables.
+ *
+ */
+void processCommand(char **parsedLine, char **env)
+{
+	pid_t pid;
+	int status;
+
+	pid = fork();
+	if (pid == -1)
+	{
+		perror(fileName);
+		exit(EXIT_FAILURE);
+	}
+
+	if (pid == 0)
+	{
+		execmd(parsedLine, env);
+	}
+
+	if (pid > 0)
+	{
+		wait(&status);
+		if (WIFEXITED(status) && WEXITSTATUS(status) == 127)
+		{
+			free2D(parsedLine);
+			free(fileName);
+			exit(WEXITSTATUS(status));
+		}
 	}
 }
 
@@ -138,40 +171,29 @@ int main(int argc, char **argv, char **env)
 	size_t len = 0;
 	ssize_t bytes_read;
 	FILE *stream = stdin;
-	pid_t pid;
-	int status;
+	char **parsedLine;
 
-	fileName = malloc(sizeof(*argv) + 1);
-	_strcpy(fileName, *argv);
+	fileName = _strdup(*argv);
 	while ((bytes_read = getline(&line, &len, stream)) != -1)
 	{
-		argv = lineparser(bytes_read, line, &argc);
-		if (argv == NULL || argv[0] == NULL || *line == '\n')
+		parsedLine = lineparser(bytes_read, line, &argc);
+		if (parsedLine == NULL || parsedLine[0] == NULL || *line == '\n')
 			continue;
 
-		if (_strcmp(*argv, "exit") == 0)
-			_exit(argv[1] ? _atoi(argv[1]) : 0);
-
-		pid = fork();  /* Create the fork process*/
-		if (pid == -1) /* Check fork error*/
+		if (_strcmp(*parsedLine, "exit") == 0)
 		{
-			perror(fileName);
-			exit(EXIT_FAILURE); /* Exit due to fork error */
+			free2D(parsedLine);
+			free(line);
+			free(fileName);
+			_exit(parsedLine[1] ? _atoi(parsedLine[1]) : 0);
 		}
 
-		if (pid == 0)
-			execmd(argv, env); /* Call execmd to execute line */
+		processCommand(parsedLine, env);
 
-		if (pid > 0)
-		{
-			wait(&status); /* Wait for the child process to stop */
-			if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
-			{
-				free(fileName);
-				exit(WEXITSTATUS(status));
-			}
-		}
+		free2D(parsedLine);
 	}
+	free(fileName);
+	free(line);
 
 	return (0); /* Exit with NO_ERRORS! */
 }
