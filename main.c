@@ -181,7 +181,7 @@ int main(int argc, char **argv, char **env)
 	int exit_status = 0;
 
 	fileName = _strdup(*argv);
-	while ((bytes_read = getline(&line, &len, stream)) != -1)
+	while ((bytes_read = _getline(&line, &len, stream)) != -1)
 	{
 		parsedLine = lineparser(bytes_read, line, &argc);
 		if (parsedLine == NULL || parsedLine[0] == NULL || *line == '\n')
