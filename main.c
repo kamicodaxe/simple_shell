@@ -1,4 +1,5 @@
 #include "shell.h"
+#include <errno.h>
 
 static char *fileName;
 
@@ -110,6 +111,7 @@ void execmd(char **argv, char **env)
 		write(STDERR_FILENO, ": 1: ", 5);
 		write(STDERR_FILENO, *argv, _strlen(*argv));
 		write(STDERR_FILENO, error_msg, _strlen(error_msg));
+		free(path);
 		exit(127);
 	}
 
@@ -141,7 +143,18 @@ int processCommand(char **parsedLine, char **env)
 	}
 
 	if (pid == 0)
+	{
 		execmd(parsedLine, env);
+		if (errno == ENOENT)
+		{
+			_exit(2);
+		}
+		else
+		{
+			perror(fileName);
+			_exit(1);
+		}
+	}
 
 	if (pid > 0)
 	{
@@ -166,7 +179,7 @@ int main(int argc, char **argv, char **env)
 	ssize_t bytes_read;
 	FILE *stream = stdin;
 	char **parsedLine;
-	int exit_status;
+	int exit_status = 0;
 
 	fileName = _strdup(*argv);
 	while ((bytes_read = getline(&line, &len, stream)) != -1)
@@ -183,6 +196,10 @@ int main(int argc, char **argv, char **env)
 		}
 
 		exit_status = processCommand(parsedLine, env);
+		if (exit_status == 2)
+		{
+			return (exit_status);
+		}
 	}
 
 	free(fileName);
